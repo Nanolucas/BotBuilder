@@ -16,6 +16,11 @@ link below.
 var Botkit = require('botkit');
 var builder = require('../');
 
+if (!process.env.token) {
+    console.log('Error: Slack token not specified in environment variables!');
+    process.exit(1);
+}
+
 var controller = Botkit.slackbot();
 var bot = controller.spawn({
    token: process.env.token
