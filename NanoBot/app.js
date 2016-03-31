@@ -5,6 +5,7 @@ An awful hello world bot for slack
 var Botkit = require('botkit');
 var builder = require('../');
 var bot_name = 'nano';
+var nanomodules = [];
 
 if (!process.env.token) {
     console.log('Error: Slack token not specified in environment variables!');
@@ -27,11 +28,10 @@ slackBot.handle = function(session, message) {
 
 	if (message.channelData.event == 'direct_message' || named_call_regex.test(message.text)) {
 		named_call = true;
-		console.log('NAMED CALL');
 		message.text = message.text.replace(named_call_regex, "$1");
 	}
 
-	console.log(message.text);
+	console.log('Message received: ' + message.text);
 	if (named_call) {
 		if (named_call && /(hi|hello|sup|howdy|hey)/.test(message.text)) {
 			session.send('hello human');
@@ -40,34 +40,33 @@ slackBot.handle = function(session, message) {
 				potential_command = message.text.replace(/\w+\s(.+)/i, "$1"),
 				fs = require('fs');
 
-				console.log('module: ' + potential_module);
-				console.log('command: ' + potential_command);
-			try {
-				fs.accessSync('./modules/' + potential_module + '.js', fs.F_OK);
-
-				console.log("Module '" + potential_module + "' exists");
-				
+			console.log('module: ' + potential_module);
+			console.log('command: ' + potential_command);
+			
+			if (!nanomodules[potential_module]) {
 				try {
-					var nanomodule = require('./modules/' + potential_module + '.js');
-					
-					console.log("Module '" + potential_module + "' loaded");
+					fs.accessSync('./modules/' + potential_module + '.js', fs.F_OK);
 					
 					try {
-						var nanomodule_instance = new nanomodule();
-						
-						var result = nanomodule_instance.run(potential_command);
-						
-						if (result) {
-							session.send(result);
-						}
+						var nanomodule = require('./modules/' + potential_module + '.js');
+
+						nanomodules[potential_module] = new nanomodule();
 					} catch (e) {
-						console.log("Error: Something broke in module '" + potential_module + "'. \nMessage: " + e);
+						console.log("Error: Module '" + potential_module + "' could not be loaded. \nMessage: " + e);
 					}
 				} catch (e) {
-					console.log("Error: Module '" + potential_module + "' could not be loaded");
+					console.log("Error: File './modules/" + potential_module + ".js' not found");
+				}
+			}
+			
+			try {
+				var result = nanomodules[potential_module].run(potential_command);
+				
+				if (result) {
+					session.send(result);
 				}
 			} catch (e) {
-				console.log("Error: File './modules/" + potential_module + ".js' not found");
+				console.log("Error: Something broke in module '" + potential_module + "'. \nMessage: " + e);
 			}
 		}
 
