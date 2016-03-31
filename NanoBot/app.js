@@ -1,16 +1,5 @@
 /*-----------------------------------------------------------------------------
-A simple "Hello World" bot for slack. SlackBot is powered by Botkit and you can
-do pretty much anything you can do in Botkit.
-
-More details about setting up Botkit can be found at:
-
-    http://howdy.ai/botkit
- 
-A detailed walkthrough of creating and running this bot can be found at the 
-link below.
-
-    http://docs.botframework.com/builder/node/bots/SlackBot
-
+An awful hello world bot for slack
 -----------------------------------------------------------------------------*/
 
 var Botkit = require('botkit');
@@ -28,9 +17,14 @@ var bot = controller.spawn({
 
 var slackBot = new builder.SlackBot(controller, bot);
 slackBot.add('/', function (session) {
-   session.send('Hello World'); 
+	console.log(session.message);
+	if (/(hi|hello|sup|howdy|hey)/.test(session.message.text)) {
+		session.send('hello human'); 
+	} else if (session.message.text == 'how are you?') {
+		session.send('go fuck yourself'); 
+	}
 });
-
+	
 slackBot.listenForMentions();
 
 bot.startRTM(function(err,bot,payload) {
