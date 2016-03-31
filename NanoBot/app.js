@@ -14,7 +14,7 @@ link below.
 -----------------------------------------------------------------------------*/
 
 var Botkit = require('botkit');
-var builder = require('../../');
+var builder = require('../');
 
 var controller = Botkit.slackbot();
 var bot = controller.spawn({
