@@ -16,7 +16,7 @@ class roll {
 
 	random_number(low, high) {
 		console.log('low: ' + low + ', high: ' + high);
-		return Math.floor(Math.random() * (high - low + 1) + low);
+		return Math.floor(Math.random() * high + low);
 	}
 }
 
